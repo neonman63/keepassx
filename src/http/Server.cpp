@@ -151,10 +151,7 @@ void Server::getLogins(const Request &r, Response *protocolResp)
     protocolResp->setSuccess();
     protocolResp->setId(r.id());
     protocolResp->setVerifier(key);
-    QList<Entry> entries = findMatchingEntries(r.id(), r.url(), r.submitUrl(), r.realm());  //TODO: filtering, request confirmation [in db adaptation layer?]
-    if (r.sortSelection()) {
-        //TODO: sorting (in db adaptation layer? here?)
-    }
+    QList<Entry> entries = findMatchingEntries(r.id(), r.url(), r.submitUrl(), r.realm(), r.sortSelection());
     protocolResp->setEntries(entries);
 }
 

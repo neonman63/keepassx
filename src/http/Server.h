@@ -58,7 +58,7 @@ public:
     virtual QString getDatabaseRecycleBinUuid() = 0;
     virtual QString getKey(const QString &id) = 0;
     virtual QString storeKey(const QString &key) = 0;
-    virtual QList<Entry> findMatchingEntries(const QString &id, const QString &url, const QString & submitUrl, const QString & realm) = 0;
+    virtual QList<Entry> findMatchingEntries(const QString &id, const QString &url, const QString & submitUrl, const QString & realm, bool sortSelection) = 0;
     virtual int countMatchingEntries(const QString &id, const QString &url, const QString & submitUrl, const QString & realm) = 0;
     virtual QList<Entry> searchAllEntries(const QString &id) = 0;
     virtual void addEntry(const QString &id, const QString &login, const QString &password, const QString &url, const QString &submitUrl, const QString &realm) = 0;

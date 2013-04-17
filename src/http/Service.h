@@ -31,7 +31,7 @@ public:
     virtual QString getDatabaseRecycleBinUuid();
     virtual QString getKey(const QString& id);
     virtual QString storeKey(const QString& key);
-    virtual QList<KeepassHttpProtocol::Entry> findMatchingEntries(const QString& id, const QString& url, const QString&  submitUrl, const QString&  realm);
+    virtual QList<KeepassHttpProtocol::Entry> findMatchingEntries(const QString& id, const QString& url, const QString&  submitUrl, const QString&  realm, bool sortSelection);
     virtual int countMatchingEntries(const QString& id, const QString& url, const QString&  submitUrl, const QString&  realm);
     virtual QList<KeepassHttpProtocol::Entry> searchAllEntries(const QString& id);
     virtual void addEntry(const QString& id, const QString& login, const QString& password, const QString& url, const QString& submitUrl, const QString& realm);
@@ -49,6 +49,8 @@ private:
     Access checkAccess(const Entry* entry, const QString&  host, const QString&  submitHost, const QString&  realm);
     bool removeFirstDomain(QString& hostname);
     Group *findCreateAddEntryGroup();
+    class SortEntries;
+    int sortPriority(const Entry *entry, const QString &host, const QString &submitUrl, const QString &baseSubmitUrl) const;
     KeepassHttpProtocol::Entry prepareEntry(const Entry* entry);
     QList<Entry*> searchEntries(const QString& text);
 
