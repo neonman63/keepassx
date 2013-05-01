@@ -38,7 +38,7 @@ public:
     static void setAlwaysAllowAccess(bool alwaysAllowAccess);
     static bool alwaysAllowUpdate();
     static void setAlwaysAllowUpdate(bool alwaysAllowUpdate);
-    static bool searchInAllDatabases();//TODO!!
+    static bool searchInAllDatabases();
     static void setSearchInAllDatabases(bool searchInAllDatabases);
     static bool supportKphFields();
     static void setSupportKphFields(bool supportKphFields);
