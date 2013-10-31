@@ -26,7 +26,7 @@ public:
     explicit Service(DatabaseTabWidget* parent = 0);
 
     virtual bool isDatabaseOpened() const;
-    virtual bool openDatabase();
+    virtual bool openDatabase(bool userRequest);
     virtual QString getDatabaseRootUuid();
     virtual QString getDatabaseRecycleBinUuid();
     virtual QString getKey(const QString& id);

@@ -84,12 +84,16 @@ void Server::handleRequest(QHttpRequest *request, QHttpResponse *response)
 void Server::handleRequestComplete(QHttpRequest *request, QHttpResponse *response)
 {
     Request r;
-    if (!isDatabaseOpened() && !openDatabase()) {
+    if (request->header("content-type").compare("application/json", Qt::CaseInsensitive) != 0 ||
+        !r.fromJson(request->body())) {
+        response->writeHead(QHttpResponse::STATUS_BAD_REQUEST);
+        response->write(QString("Failed to parse content"));
+        response->end();
+    }
+    else if (!isDatabaseOpened() && !openDatabase(r.triggerUnlock())) {
         response->writeHead(QHttpResponse::STATUS_SERVICE_UNAVAILABLE);
         response->end();
-    } else if (request->header("content-type").compare("application/json", Qt::CaseInsensitive) == 0 &&
-               r.fromJson(request->body())) {
-
+    } else {
         QByteArray hash = QCryptographicHash::hash((getDatabaseRootUuid() + getDatabaseRecycleBinUuid()).toUtf8(),
                                                    QCryptographicHash::Sha1).toHex();
 
@@ -110,9 +114,6 @@ void Server::handleRequestComplete(QHttpRequest *request, QHttpResponse *respons
         response->setHeader("Content-Length", QString::number(s.size()));
         response->writeHead(QHttpResponse::STATUS_OK);
         response->write(s);
-        response->end();
-    } else {
-        response->writeHead(QHttpResponse::STATUS_BAD_REQUEST);
         response->end();
     }
 }

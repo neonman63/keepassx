@@ -53,7 +53,7 @@ public:
 
     //TODO: use QByteArray?
     virtual bool isDatabaseOpened() const = 0;
-    virtual bool openDatabase() = 0;
+    virtual bool openDatabase(bool userRequest) = 0;
     virtual QString getDatabaseRootUuid() = 0;
     virtual QString getDatabaseRecycleBinUuid() = 0;
     virtual QString getKey(const QString &id) = 0;

@@ -85,9 +85,9 @@ bool Service::isDatabaseOpened() const
     return false;
 }
 
-bool Service::openDatabase()
+bool Service::openDatabase(bool userRequest)
 {
-    if (!HttpSettings::unlockDatabase())
+    if (!HttpSettings::unlockDatabase() && !userRequest)
         return false;
     if (DatabaseWidget * dbWidget = m_dbTabWidget->currentDatabaseWidget()) {
         switch(dbWidget->currentMode()) {

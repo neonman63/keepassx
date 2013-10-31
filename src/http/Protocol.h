@@ -50,6 +50,7 @@ class Request : public QObject
     Q_PROPERTY(QString Verifier      READ verifier       WRITE setVerifier     )
     Q_PROPERTY(QString Nonce         READ nonce          WRITE setNonce        )
     Q_PROPERTY(QString Realm         READ realm          WRITE setRealm        )
+    Q_PROPERTY(bool    TriggerUnlock READ triggerUnlock  WRITE setTriggerUnlock)
 
 public:
     Request();
@@ -68,6 +69,7 @@ public:
     QString verifier() const;
     QString nonce() const;
     QString realm() const;
+    bool triggerUnlock() const;
     bool CheckVerifier(const QString & key) const;
 
 private:
@@ -83,6 +85,7 @@ private:
     void setVerifier(const QString &verifier);
     void setNonce(const QString &nonce);
     void setRealm(const QString &realm);
+    void setTriggerUnlock(bool triggerUnlock);
 
     QString m_requestType;
     bool m_sortSelection;
@@ -96,6 +99,7 @@ private:
     QString m_verifier;
     QString m_nonce;
     QString m_realm;
+    bool    m_triggerUnlock;
     mutable SymmetricCipher m_cipher;
 };
 

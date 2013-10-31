@@ -46,7 +46,7 @@ void HttpSettings::setBestMatchOnly(bool bestMatchOnly)
 
 bool HttpSettings::unlockDatabase()
 {
-    return config()->get("Http/UnlockDatabase", true).toBool();
+    return config()->get("Http/UnlockDatabase", false).toBool();
 }
 
 void HttpSettings::setUnlockDatabase(bool unlockDatabase)
