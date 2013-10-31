@@ -36,7 +36,7 @@ public:
     virtual QList<KeepassHttpProtocol::Entry> searchAllEntries(const QString& id);
     virtual void addEntry(const QString& id, const QString& login, const QString& password, const QString& url, const QString& submitUrl, const QString& realm);
     virtual void updateEntry(const QString& id, const QString& uuid, const QString& login, const QString& password, const QString& url);
-    virtual QString generatePassword();
+    virtual QString generatePassword(int* qualitybits);
 
 public Q_SLOTS:
     void removeSharedEncryptionKeys();

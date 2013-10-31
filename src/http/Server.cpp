@@ -206,12 +206,13 @@ void Server::generatePassword(const Request &r, Response *protocolResp)
     if (!r.CheckVerifier(key))
         return;
 
-    QString password = generatePassword();
+    int qualityBits;
+    QString password = generatePassword(&qualityBits);
 
     protocolResp->setSuccess();
     protocolResp->setId(r.id());
     protocolResp->setVerifier(key);
-    protocolResp->setEntries(QList<Entry>() << Entry("generate-password", "generate-password", password, "generate-password"));
+    protocolResp->setEntries(QList<Entry>() << Entry(r.requestTypeStr(), QString::number(qualityBits), password, r.requestTypeStr()));
 
     memset(password.data(), 0, password.length());
 }

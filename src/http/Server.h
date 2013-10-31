@@ -63,7 +63,7 @@ public:
     virtual QList<Entry> searchAllEntries(const QString &id) = 0;
     virtual void addEntry(const QString &id, const QString &login, const QString &password, const QString &url, const QString &submitUrl, const QString &realm) = 0;
     virtual void updateEntry(const QString &id, const QString &uuid, const QString &login, const QString &password, const QString &url) = 0;
-    virtual QString generatePassword() = 0;
+    virtual QString generatePassword(int* qualityBits) = 0;
 
 public Q_SLOTS:
     void start();

@@ -15,6 +15,7 @@
 #include <QtGui/QMessageBox>
 #include <QtGui/QProgressDialog>
 #include <QtCore/QDebug>
+#include <qmath.h>
 
 #include "Service.h"
 #include "Protocol.h"
@@ -486,9 +487,38 @@ void Service::updateEntry(const QString &id, const QString &uuid, const QString 
             }
 }
 
-QString Service::generatePassword()
+QString Service::generatePassword(int* qualitybits)
 {
     PasswordGenerator * pwGenerator = passwordGenerator();
+    if (qualitybits) {
+        int num = 0;
+        if (HttpSettings::passwordUseLowercase()) {
+            num += 26;
+            if (HttpSettings::passwordExcludeAlike())
+                num -= 1;
+        }
+        if (HttpSettings::passwordUseUppercase()) {
+            num += 26;
+            if (HttpSettings::passwordExcludeAlike())
+                num -= 2;
+        }
+        if (HttpSettings::passwordUseNumbers()) {
+            num += 10;
+            if (HttpSettings::passwordExcludeAlike())
+                num -= 2;
+        }
+        if (HttpSettings::passwordUseSpecial()) {
+            num += 32;
+            if (HttpSettings::passwordExcludeAlike())
+                num -= 1;
+        }
+
+        float bits = 0;
+        if (num)
+            bits = qLn(num) / qLn(2.0f);
+        bits = bits * HttpSettings::passwordLength();
+        *qualitybits = bits + 0.5f;
+    }
     return pwGenerator->generatePassword(HttpSettings::passwordLength(),
                                          HttpSettings::passwordCharClasses(),
                                          HttpSettings::passwordGeneratorFlags());
