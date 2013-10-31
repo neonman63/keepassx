@@ -52,19 +52,23 @@ void RequestHandler::onEnd()
 Server::Server(QObject *parent) :
     QObject(parent),
     m_httpServer(new QHttpServer(this)),
-    m_started(false)
+    m_started(false),
+    m_port(19455)
 {
     connect(m_httpServer, SIGNAL(newRequest(QHttpRequest*,QHttpResponse*)), this, SLOT(handleRequest(QHttpRequest*,QHttpResponse*)));
 }
 
-void Server::start()
+void Server::start(int port)
 {
+    if (m_port != port)
+        stop(); //restart to listen on the new port
+
     if (m_started)
         return;
 
-    static const int PORT = 19455;
-    m_started = m_httpServer->listen(QHostAddress::LocalHost, PORT)
-             || m_httpServer->listen(QHostAddress::LocalHostIPv6, PORT);
+    m_port = port;
+    m_started = m_httpServer->listen(QHostAddress::LocalHost, port)
+             || m_httpServer->listen(QHostAddress::LocalHostIPv6, port);
 }
 
 void Server::stop()

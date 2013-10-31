@@ -61,7 +61,7 @@ public:
     virtual void saveSettings(QWidget * widget) {
         qobject_cast<OptionDialog*>(widget)->saveSettings();
         if (HttpSettings::isEnabled())
-            m_service->start();
+            m_service->start(HttpSettings::listenerPort());
         else
             m_service->stop();
     }

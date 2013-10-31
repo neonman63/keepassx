@@ -66,7 +66,7 @@ public:
     virtual QString generatePassword(int* qualityBits) = 0;
 
 public Q_SLOTS:
-    void start();
+    void start(int port);
     void stop();
 
 private Q_SLOTS:
@@ -84,6 +84,7 @@ private:
 
     QHttpServer * const m_httpServer;
     bool m_started;
+    int m_port;
 };
 
 }   /*namespace KeepassHttpProtocol*/

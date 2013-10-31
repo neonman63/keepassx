@@ -124,6 +124,16 @@ void HttpSettings::setSupportKphFields(bool supportKphFields)
     config()->set("Http/SupportKphFields", supportKphFields);
 }
 
+int HttpSettings::listenerPort()
+{
+    return config()->get("Http/ListenerPort", 19455).toBool();
+}
+
+void HttpSettings::setListenerPort(int port)
+{
+    config()->set("Http/ListenerPort", port);
+}
+
 bool HttpSettings::passwordUseNumbers()
 {
     return config()->get("Http/PasswordUseNumbers", true).toBool();

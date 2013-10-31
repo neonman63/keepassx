@@ -46,7 +46,7 @@ Service::Service(DatabaseTabWidget* parent) :
     m_dbTabWidget(parent)
 {
     if (HttpSettings::isEnabled())
-        start();
+        start(HttpSettings::listenerPort());
 }
 
 Entry* Service::getConfigEntry(bool create)

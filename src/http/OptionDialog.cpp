@@ -54,6 +54,7 @@ void OptionDialog::loadSettings()
     ui->alwaysAllowAccess->setChecked(settings.alwaysAllowAccess());
     ui->alwaysAllowUpdate->setChecked(settings.alwaysAllowUpdate());
     ui->searchInAllDatabases->setChecked(settings.searchInAllDatabases());
+    ui->httpPort->setValue(settings.listenerPort());
 }
 
 void OptionDialog::saveSettings()
@@ -78,4 +79,5 @@ void OptionDialog::saveSettings()
     settings.setAlwaysAllowAccess(ui->alwaysAllowAccess->isChecked());
     settings.setAlwaysAllowUpdate(ui->alwaysAllowUpdate->isChecked());
     settings.setSearchInAllDatabases(ui->searchInAllDatabases->isChecked());
+    settings.setListenerPort(ui->httpPort->value());
 }
