@@ -50,7 +50,7 @@
 extern "C" {
 #include <liboath/oath.h>
 }
-#define TOTP_ATTR "totp"
+#define TOTP_ATTR "TOTP Seed"
 #endif
 
 DatabaseWidget::DatabaseWidget(Database* db, QWidget* parent)
