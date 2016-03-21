@@ -21,8 +21,6 @@
 
 #include <QApplication>
 
-#include "core/Global.h"
-
 class Application : public QApplication
 {
     Q_OBJECT
@@ -31,10 +29,7 @@ public:
     Application(int& argc, char** argv);
     void setMainWindow(QWidget* mainWindow);
 
-    bool event(QEvent* event) Q_DECL_OVERRIDE;
-#ifdef Q_WS_X11
-    bool x11EventFilter(XEvent* event) Q_DECL_OVERRIDE;
-#endif
+    bool event(QEvent* event) override;
 
 Q_SIGNALS:
     void openFile(const QString& filename);

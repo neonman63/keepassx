@@ -31,10 +31,10 @@
 typedef QPair<QString, QString> StringPair;
 
 KeePass2XmlReader::KeePass2XmlReader()
-    : m_randomStream(Q_NULLPTR)
-    , m_db(Q_NULLPTR)
-    , m_meta(Q_NULLPTR)
-    , m_tmpParent(Q_NULLPTR)
+    : m_randomStream(nullptr)
+    , m_db(nullptr)
+    , m_meta(nullptr)
+    , m_tmpParent(nullptr)
     , m_error(false)
     , m_strictMode(false)
 {
@@ -1045,7 +1045,7 @@ QDateTime KeePass2XmlReader::readDateTime()
             raiseError("Invalid date time value");
         }
         else {
-            dt = Tools::currentDateTimeUtc();
+            dt = QDateTime::currentDateTimeUtc();
         }
     }
 
@@ -1146,7 +1146,7 @@ QByteArray KeePass2XmlReader::readCompressedBinary()
 Group* KeePass2XmlReader::getGroup(const Uuid& uuid)
 {
     if (uuid.isNull()) {
-        return Q_NULLPTR;
+        return nullptr;
     }
 
     if (m_groups.contains(uuid)) {
@@ -1165,7 +1165,7 @@ Group* KeePass2XmlReader::getGroup(const Uuid& uuid)
 Entry* KeePass2XmlReader::getEntry(const Uuid& uuid)
 {
     if (uuid.isNull()) {
-        return Q_NULLPTR;
+        return nullptr;
     }
 
     if (m_entries.contains(uuid)) {

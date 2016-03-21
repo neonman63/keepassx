@@ -16,14 +16,16 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "AutoTypeX11.h"
+#include "AutoTypeXCB.h"
 #include "KeySymMap.h"
+#include "core/Tools.h"
 
 #include <time.h>
+#include <xcb/xcb.h>
 
 bool AutoTypePlatformX11::m_catchXErrors = false;
 bool AutoTypePlatformX11::m_xErrorOccured = false;
-int (*AutoTypePlatformX11::m_oldXErrorHandler)(Display*, XErrorEvent*) = Q_NULLPTR;
+int (*AutoTypePlatformX11::m_oldXErrorHandler)(Display*, XErrorEvent*) = nullptr;
 
 AutoTypePlatformX11::AutoTypePlatformX11()
 {
@@ -46,8 +48,8 @@ AutoTypePlatformX11::AutoTypePlatformX11()
     m_currentGlobalKey = static_cast<Qt::Key>(0);
     m_currentGlobalModifiers = 0;
 
-    m_keysymTable = Q_NULLPTR;
-    m_xkb = Q_NULLPTR;
+    m_keysymTable = nullptr;
+    m_xkb = nullptr;
     m_remapKeycode = 0;
     m_currentRemapKeysym = NoSymbol;
     m_modifierMask = ControlMask | ShiftMask | Mod1Mask | Mod4Mask;
@@ -119,7 +121,7 @@ WId AutoTypePlatformX11::activeWindow()
 
         Window root;
         Window parent;
-        Window* children = Q_NULLPTR;
+        Window* children = nullptr;
         unsigned int numChildren;
         tree = XQueryTree(m_dpy, window, &root, &parent, &children, &numChildren);
         window = parent;
@@ -202,22 +204,42 @@ void AutoTypePlatformX11::unregisterGlobalShortcut(Qt::Key key, Qt::KeyboardModi
 
 int AutoTypePlatformX11::platformEventFilter(void* event)
 {
-    XEvent* xevent = static_cast<XEvent*>(event);
+    xcb_generic_event_t* genericEvent = static_cast<xcb_generic_event_t*>(event);
+    quint8 type = genericEvent->response_type & 0x7f;
 
-    if ((xevent->type == KeyPress || xevent->type == KeyRelease)
-            && m_currentGlobalKey
-            && xevent->xkey.keycode == m_currentGlobalKeycode
-            && (xevent->xkey.state & m_modifierMask) == m_currentGlobalNativeModifiers
-            && (!QApplication::activeWindow() || QApplication::activeWindow()->isMinimized())
-            && m_loaded) {
-        if (xevent->type == KeyPress) {
-            Q_EMIT globalShortcutTriggered();
+    if (type == XCB_KEY_PRESS || type == XCB_KEY_RELEASE) {
+        xcb_key_press_event_t* keyPressEvent = static_cast<xcb_key_press_event_t*>(event);
+        if (keyPressEvent->detail == m_currentGlobalKeycode
+                && (keyPressEvent->state & m_modifierMask) == m_currentGlobalNativeModifiers
+                && (!QApplication::activeWindow() || QApplication::activeWindow()->isMinimized())
+                && m_loaded) {
+            if (type == XCB_KEY_PRESS) {
+                Q_EMIT globalShortcutTriggered();
+            }
+
+            return 1;
         }
-        return 1;
     }
-    if (xevent->type == MappingNotify && m_loaded) {
-        XRefreshKeyboardMapping(reinterpret_cast<XMappingEvent*>(xevent));
-        updateKeymap();
+    else if (type == XCB_MAPPING_NOTIFY) {
+        xcb_mapping_notify_event_t* mappingNotifyEvent = static_cast<xcb_mapping_notify_event_t*>(event);
+        if (mappingNotifyEvent->request == XCB_MAPPING_KEYBOARD
+                || mappingNotifyEvent->request == XCB_MAPPING_MODIFIER)
+        {
+            XMappingEvent xMappingEvent;
+            memset(&xMappingEvent, 0, sizeof(xMappingEvent));
+            xMappingEvent.type = MappingNotify;
+            xMappingEvent.display = m_dpy;
+            if (mappingNotifyEvent->request == XCB_MAPPING_KEYBOARD) {
+                xMappingEvent.request = MappingKeyboard;
+            }
+            else {
+                xMappingEvent.request = MappingModifier;
+            }
+            xMappingEvent.first_keycode = mappingNotifyEvent->first_keycode;
+            xMappingEvent.count = mappingNotifyEvent->count;
+            XRefreshKeyboardMapping(&xMappingEvent);
+            updateKeymap();
+        }
     }
 
     return -1;
@@ -236,7 +258,7 @@ QString AutoTypePlatformX11::windowTitle(Window window, bool useBlacklist)
     int format;
     unsigned long nitems;
     unsigned long after;
-    unsigned char* data = Q_NULLPTR;
+    unsigned char* data = nullptr;
 
     // the window manager spec says we should read _NET_WM_NAME first, then fall back to WM_NAME
 
@@ -250,7 +272,7 @@ QString AutoTypePlatformX11::windowTitle(Window window, bool useBlacklist)
         XTextProperty textProp;
         retVal = XGetTextProperty(m_dpy, window, &textProp, m_atomWmName);
         if ((retVal != 0) && textProp.value) {
-            char** textList = Q_NULLPTR;
+            char** textList = nullptr;
             int count;
 
             if (textProp.encoding == m_atomUtf8String) {
@@ -302,8 +324,8 @@ QString AutoTypePlatformX11::windowClassName(Window window)
     QString className;
 
     XClassHint wmClass;
-    wmClass.res_name = Q_NULLPTR;
-    wmClass.res_class = Q_NULLPTR;
+    wmClass.res_name = nullptr;
+    wmClass.res_class = nullptr;
 
     if (XGetClassHint(m_dpy, window, &wmClass) && wmClass.res_name) {
         className = QString::fromLocal8Bit(wmClass.res_name);
@@ -342,7 +364,7 @@ QStringList AutoTypePlatformX11::windowTitlesRecursive(Window window)
 
     Window root;
     Window parent;
-    Window* children = Q_NULLPTR;
+    Window* children = nullptr;
     unsigned int numChildren;
     if (XQueryTree(m_dpy, window, &root, &parent, &children, &numChildren) && children) {
         for (uint i = 0; i < numChildren; i++) {
@@ -362,7 +384,7 @@ bool AutoTypePlatformX11::isTopLevelWindow(Window window)
     int format;
     unsigned long nitems;
     unsigned long after;
-    unsigned char* data = Q_NULLPTR;
+    unsigned char* data = nullptr;
     int retVal = XGetWindowProperty(m_dpy, window, m_atomWmState, 0, 0, False, AnyPropertyType, &type, &format,
                                     &nitems, &after, &data);
     if (data) {
@@ -383,9 +405,9 @@ KeySym AutoTypePlatformX11::charToKeySym(const QChar& ch)
     }
 
     /* mapping table generated from keysymdef.h */
-    const uint* match = qBinaryFind(m_unicodeToKeysymKeys,
-                                    m_unicodeToKeysymKeys + m_unicodeToKeysymLen,
-                                    unicode);
+    const uint* match = Tools::binaryFind(m_unicodeToKeysymKeys,
+                                          m_unicodeToKeysymKeys + m_unicodeToKeysymLen,
+                                          unicode);
     int index = match - m_unicodeToKeysymKeys;
     if (index != m_unicodeToKeysymLen) {
         return m_unicodeToKeysymValues[index];
@@ -506,7 +528,7 @@ void AutoTypePlatformX11::updateKeymap()
     timespec ts;
     ts.tv_sec = 0;
     ts.tv_nsec = 30 * 1000 * 1000;
-    nanosleep(&ts, Q_NULLPTR);
+    nanosleep(&ts, nullptr);
 }
 
 bool AutoTypePlatformX11::isRemapKeycodeValid()
@@ -557,7 +579,7 @@ XkbDescPtr AutoTypePlatformX11::getKeyboard()
     XID keyboard_id = XkbUseCoreKbd;
     XDeviceInfo* devices = XListInputDevices(m_dpy, &num_devices);
     if (!devices) {
-        return Q_NULLPTR;
+        return nullptr;
     }
 
     for (int i = 0; i < num_devices; i++) {
@@ -713,7 +735,7 @@ void AutoTypePlatformX11::SendKeyPressedEvent(KeySym keysym)
     event.y = 1;
     event.x_root = 1;
     event.y_root = 1;
-    event.same_screen = TRUE;
+    event.same_screen = True;
 
     Window root, child;
     int root_x, root_y, x, y;
@@ -846,5 +868,3 @@ bool AutoTypePlatformX11::raiseWindow(WId window)
 
     return true;
 }
-
-Q_EXPORT_PLUGIN2(keepassx-autotype-x11, AutoTypePlatformX11)

@@ -74,7 +74,7 @@ const QString MainWindow::BaseWindowTitle = "KeePassX";
 
 MainWindow::MainWindow()
     : m_ui(new Ui::MainWindow())
-    , m_trayIcon(Q_NULLPTR)
+    , m_trayIcon(nullptr)
 {
     m_ui->setupUi(this);
 
@@ -268,6 +268,7 @@ void MainWindow::updateLastDatabasesMenu()
     QStringList lastDatabases = config()->get("LastDatabases", QVariant()).toStringList();
     Q_FOREACH (const QString& database, lastDatabases) {
         QAction* action = m_ui->menuRecentDatabases->addAction(database);
+        action->setData(database);
         m_lastDatabasesActions->addAction(action);
     }
     m_ui->menuRecentDatabases->addSeparator();
@@ -298,7 +299,7 @@ void MainWindow::updateCopyAttributesMenu()
 
 void MainWindow::openRecentDatabase(QAction* action)
 {
-    openDatabase(action->text());
+    openDatabase(action->data().toString());
 }
 
 void MainWindow::clearLastDatabases()
@@ -494,7 +495,7 @@ void MainWindow::closeEvent(QCloseEvent* event)
     }
 }
 
-void MainWindow::changeEvent(QEvent *event)
+void MainWindow::changeEvent(QEvent* event)
 {
     if ((event->type() == QEvent::WindowStateChange) && isMinimized()
             && isTrayIconEnabled() && m_trayIcon && m_trayIcon->isVisible()
@@ -565,7 +566,7 @@ void MainWindow::updateTrayIcon()
         if (m_trayIcon) {
             m_trayIcon->hide();
             delete m_trayIcon;
-            m_trayIcon = Q_NULLPTR;
+            m_trayIcon = nullptr;
         }
     }
 }
@@ -666,7 +667,7 @@ void MainWindow::repairDatabase()
     if (dialog->exec() == QDialog::Accepted && dbRepairWidget->database()) {
         QString saveFileName = fileDialog()->getSaveFileName(this, tr("Save repaired database"), QString(),
                                                              tr("KeePass 2 Database").append(" (*.kdbx)"),
-                                                             Q_NULLPTR, 0, "kdbx");
+                                                             nullptr, 0, "kdbx");
 
         if (!saveFileName.isEmpty()) {
             KeePass2Writer writer;

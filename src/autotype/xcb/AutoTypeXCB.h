@@ -16,8 +16,8 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef KEEPASSX_AUTOTYPEX11_H
-#define KEEPASSX_AUTOTYPEX11_H
+#ifndef KEEPASSX_AUTOTYPEXCB_H
+#define KEEPASSX_AUTOTYPEXCB_H
 
 #include <QApplication>
 #include <QSet>
@@ -31,28 +31,28 @@
 
 #include "autotype/AutoTypePlatformPlugin.h"
 #include "autotype/AutoTypeAction.h"
-#include "core/Global.h"
 
 #define N_MOD_INDICES (Mod5MapIndex + 1)
 
 class AutoTypePlatformX11 : public QObject, public AutoTypePlatformInterface
 {
     Q_OBJECT
+    Q_PLUGIN_METADATA(IID "org.keepassx.AutoTypePlatformX11")
     Q_INTERFACES(AutoTypePlatformInterface)
 
 public:
     AutoTypePlatformX11();
-    bool isAvailable() Q_DECL_OVERRIDE;
-    void unload() Q_DECL_OVERRIDE;
-    QStringList windowTitles() Q_DECL_OVERRIDE;
-    WId activeWindow() Q_DECL_OVERRIDE;
-    QString activeWindowTitle() Q_DECL_OVERRIDE;
-    bool registerGlobalShortcut(Qt::Key key, Qt::KeyboardModifiers modifiers) Q_DECL_OVERRIDE;
-    void unregisterGlobalShortcut(Qt::Key key, Qt::KeyboardModifiers modifiers) Q_DECL_OVERRIDE;
-    int platformEventFilter(void* event) Q_DECL_OVERRIDE;
-    int initialTimeout() Q_DECL_OVERRIDE;
-    bool raiseWindow(WId window) Q_DECL_OVERRIDE;
-    AutoTypeExecutor* createExecutor() Q_DECL_OVERRIDE;
+    bool isAvailable() override;
+    void unload() override;
+    QStringList windowTitles() override;
+    WId activeWindow() override;
+    QString activeWindowTitle() override;
+    bool registerGlobalShortcut(Qt::Key key, Qt::KeyboardModifiers modifiers) override;
+    void unregisterGlobalShortcut(Qt::Key key, Qt::KeyboardModifiers modifiers) override;
+    int platformEventFilter(void* event) override;
+    int initialTimeout() override;
+    bool raiseWindow(WId window) override;
+    AutoTypeExecutor* createExecutor() override;
 
     KeySym charToKeySym(const QChar& ch);
     KeySym keyToKeySym(Qt::Key key);
@@ -124,11 +124,11 @@ class AutoTypeExecturorX11 : public AutoTypeExecutor
 public:
     explicit AutoTypeExecturorX11(AutoTypePlatformX11* platform);
 
-    void execChar(AutoTypeChar* action) Q_DECL_OVERRIDE;
-    void execKey(AutoTypeKey* action) Q_DECL_OVERRIDE;
+    void execChar(AutoTypeChar* action) override;
+    void execKey(AutoTypeKey* action) override;
 
 private:
     AutoTypePlatformX11* const m_platform;
 };
 
-#endif // KEEPASSX_AUTOTYPEX11_H
+#endif // KEEPASSX_AUTOTYPEXCB_H
